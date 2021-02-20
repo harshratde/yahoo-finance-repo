@@ -14,7 +14,7 @@ from lxml import html
 import requests
 
 
-ROOT_WEBPAGE = 'https://finance.yahoo.com/'
+ROOT_WEBPAGE = 'https://finance.yahoo.com'
 
 def get_tree(PAGE):
     page = requests.get(PAGE)
@@ -31,12 +31,12 @@ tree = get_tree(ROOT_WEBPAGE)
 
 
 
-def get_attrib_list(XPATH, keep_tags):
+def get_attrib_list(tree_obj, XPATH, keep_tags):
     
     # XPATH = '//*[@id="data-util-col"]/section[3]/header/a'
     # keep_tags = ['href', 'title']
     
-    buyers = tree.xpath(XPATH)
+    buyers = tree_obj.xpath(XPATH)
     
     dir(buyers[0])
     attrib_dict = buyers[0].attrib
@@ -67,5 +67,32 @@ attrib_master = pd.concat(coll_attribs)
 
 
 
+title_sel = 'Cryptocurrencies'
 
 
+attrib_sel = attrib_master[attrib_master['title'] == title_sel]
+attrib_link = attrib_sel['href'].values[0]
+
+
+further_parse = f'{ROOT_WEBPAGE}{attrib_link}'
+print(further_parse)
+
+
+
+# ============================================================================
+sub_tree = get_tree(further_parse)
+
+get_attrib_list(tree_obj, XPATH, keep_tags)
+
+
+ck = sub_tree.xpath('//*[@id="scr-res-table"]/div[1]/table/tbody/tr[1]/td[1]')
+ck = sub_tree.xpath('//*[@id="scr-res-table"]/div[1]/table/tbody/tr[1]/td[1]/a')
+
+
+dir(ck[0])
+
+ck[0].text_content()
+
+ck[0].attrib
+
+f'{ROOT_WEBPAGE}{ck[0].attrib["href"]}'
